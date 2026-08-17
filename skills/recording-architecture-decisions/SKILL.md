@@ -36,19 +36,33 @@ Every ADR must contain these sections in this order:
 6. `Alternatives`
 7. `References`
 
-Do not introduce additional lifecycle statuses or change the ADR structure unless the skill itself is being changed.
+The first non-empty line under `Status` is the canonical status. The ADR index must use exactly that line.
+
+For `Rejected`, `Deprecated`, or `Superseded by ADR NNNN`, add exactly one lifecycle note after the canonical status, separated by a blank line. Use these forms:
+
+- `Lifecycle note (YYYY-MM-DD): Rejected because <reason>.`
+- `Lifecycle note (YYYY-MM-DD): Deprecated because <reason>.`
+- `Lifecycle note (YYYY-MM-DD): Superseded by [ADR NNNN](NNNN-short-kebab-case-title.md).`
+
+The lifecycle-note date is the date the status change is recorded in the ADR. Do not present it as an inferred historical decision date.
+
+Do not introduce additional lifecycle statuses, lifecycle-note formats, or ADR sections unless the skill itself is being changed.
 
 ## Handle existing ADR conventions
 
-Before creating or modifying an ADR, inspect `docs/adr/` if it exists.
+Before initializing this convention, determine whether the repository already has an ADR convention.
+
+Inspect repository instructions and architecture documentation, then search the repository for existing Architecture Decision Records, ADR indexes, ADR templates, and ADR-specific directories or filenames. Do not assume that an existing convention must live under `docs/adr/`.
+
+Treat an ADR convention as existing when the repository contains at least one ADR record, an ADR index or template, or explicit repository instructions defining how ADRs are managed.
+
+If no ADR convention exists, initialize the convention defined by this skill under `docs/adr/`.
 
 If the repository already uses this convention, continue using it.
 
-If no ADR convention exists, initialize the convention defined by this skill.
+If the repository already contains a materially incompatible ADR convention, do not create a second convention, mix formats, or silently migrate existing records. Report the conflict and leave the existing convention unchanged unless the user explicitly asks to migrate it.
 
-If the repository already contains a materially incompatible ADR convention, do not mix formats or silently migrate existing records. Report the conflict and leave the existing convention unchanged unless the user explicitly asks to migrate it.
-
-A convention is materially incompatible when it differs in ways that would create ambiguous lifecycle, numbering, indexing, or record structure.
+A convention is materially incompatible when it differs in ways that would create conflicting locations, lifecycle states, numbering, indexing, filenames, or record structure.
 
 ## Qualify the candidate
 
@@ -81,11 +95,16 @@ Route rejected material to the artifact that owns it:
 
 Create a new ADR with status `Proposed` when the decision is still under consideration.
 
-Allocate the next sequential four-digit identifier by inspecting the existing ADR filenames and index.
+Allocate the identifier deterministically:
+
+1. Collect all valid four-digit ADR identifiers present in ADR filenames and the ADR index.
+2. If none exist, use `0001`.
+3. Otherwise use the highest previously allocated identifier plus one.
+4. Never fill or reuse a gap in the identifier sequence.
+
+If the same identifier refers to multiple ADR files, or the filename and index disagree about which ADR owns an identifier, report the inconsistency and do not allocate a new identifier until it is resolved.
 
 Copy `assets/adr-template.md` and replace all placeholders.
-
-Do not reuse missing identifiers.
 
 ### Accept
 
@@ -97,6 +116,8 @@ Acceptance must be supported by at least one authoritative signal, such as:
 - repository history showing that the decision has already been adopted;
 - an accepted issue, pull request, or other authoritative project record.
 
+A retrospective ADR may be created directly as `Accepted` when authoritative evidence establishes that the decision was already adopted. Do not manufacture a `Proposed` phase for an already-made decision.
+
 Do not turn an agent recommendation into an accepted architecture decision.
 
 Before accepting, ensure the decision, consequences, and alternatives are sufficiently clear.
@@ -107,17 +128,21 @@ Change an ADR from `Proposed` to `Rejected` when the considered decision has exp
 
 Preserve the proposal and its rationale as historical context.
 
+Add the required `Rejected` lifecycle note under `Status` and state the reason without materially rewriting the historical sections.
+
 Do not delete rejected ADRs or reuse their identifiers.
 
 ### Supersede
 
 Create a new ADR when an accepted decision is replaced by a new decision.
 
-The new ADR receives a new sequential identifier and follows the normal template.
+The new ADR receives a new identifier according to the normal allocation rule and follows the normal template.
 
-Change the old ADR status to:
+Change the old ADR canonical status to:
 
 `Superseded by ADR NNNN`
+
+Add the required supersession lifecycle note under `Status`.
 
 Add a reference from the old ADR to the new ADR.
 
@@ -129,7 +154,7 @@ Do not materially rewrite the old accepted decision.
 
 Change an ADR status to `Deprecated` when the decision no longer applies and no replacement decision exists.
 
-Explain the reason in the ADR while preserving the historical decision itself.
+Add the required `Deprecated` lifecycle note under `Status` and explain the reason there while preserving the historical decision itself.
 
 Do not use `Deprecated` when another ADR replaces the decision. Use supersession instead.
 
@@ -145,7 +170,7 @@ Allowed maintenance is limited to:
 - formatting corrections;
 - broken-link repair;
 - minor clarifications that do not change the original meaning;
-- lifecycle metadata and reciprocal references required by deprecation or supersession.
+- lifecycle metadata and reciprocal references required by rejection, deprecation, or supersession.
 
 Record substantive changes as a new ADR.
 
@@ -229,29 +254,35 @@ Link relevant authoritative material when available, such as:
 
 Use relative repository links when practical.
 
+When no references exist, write exactly `None.`.
+
 Do not duplicate procedural documentation in the ADR.
 
 ## Maintain the ADR index
 
-Ensure `docs/adr/README.md` exists.
+Ensure `docs/adr/README.md` exists when this skill's convention is in use.
 
-Use this table structure:
+When initializing the index, use this structure:
 
 ```markdown
+# Architecture Decision Records
+
 | ID                               | Decision         | Status   | Date       |
 |----------------------------------|------------------|----------|------------|
 | [0001](0001-example-decision.md) | Example decision | Accepted | 2026-01-01 |
 ```
 
+The example row demonstrates the format only. Do not retain it in a real index unless it represents a real ADR.
+
 Keep entries ordered by ascending ADR identifier.
 
 For every ADR, the index must contain:
 
-* the four-digit ID;
-* a relative link to the ADR file;
-* the ADR title without the `ADR NNNN:` prefix;
-* the exact ADR status;
-* the ADR date.
+- the four-digit ID;
+- a relative link to the ADR file;
+- the ADR title without the `ADR NNNN:` prefix;
+- the canonical ADR status from the first non-empty line under `Status`;
+- the ADR date from the `Date` section.
 
 Update the index whenever an ADR is created or its lifecycle status changes.
 
@@ -261,24 +292,26 @@ Do not remove rejected, deprecated, or superseded ADRs from the index.
 
 Before handoff:
 
-* confirm the candidate qualifies as a durable architecture decision;
-* verify the four-digit identifier is unique and sequential;
-* verify the filename matches `NNNN-short-kebab-case-title.md`;
-* verify all required sections exist and appear in the required order;
-* verify the status is one of the allowed statuses;
-* verify dates use `YYYY-MM-DD`;
-* verify the ADR index matches the ADR;
-* verify supersession references are reciprocal;
-* verify relative links resolve where practical;
-* verify historical ADR content was not materially rewritten;
-* run relevant repository formatting or validation checks when available;
-* run `git diff --check` when working in a Git repository.
+- confirm the candidate qualifies as a durable architecture decision;
+- verify the identifier is unique and, for a new ADR, equals the highest previously allocated identifier plus one or `0001` when none existed;
+- verify no missing identifier was reused;
+- verify the filename matches `NNNN-short-kebab-case-title.md`;
+- verify all required sections exist and appear in the required order;
+- verify the first non-empty line under `Status` is one of the allowed canonical statuses;
+- verify required lifecycle notes use the exact defined format;
+- verify dates use `YYYY-MM-DD`;
+- verify the ADR index matches the ADR;
+- verify supersession references are reciprocal;
+- verify relative links resolve where practical;
+- verify historical ADR content was not materially rewritten;
+- run relevant repository formatting or validation checks when available;
+- run `git diff --check` when working in a Git repository.
 
 Report briefly:
 
-* what ADR was created or changed;
-* why the decision qualified for an ADR;
-* its resulting lifecycle status;
-* any supersession, rejection, or deprecation relationship.
+- what ADR was created or changed;
+- why the decision qualified for an ADR;
+- its resulting lifecycle status;
+- any supersession, rejection, or deprecation relationship.
 
 If the candidate did not qualify, report why and where the information belongs instead.
