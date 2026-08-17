@@ -1,0 +1,8 @@
+{
+    "name": "dev-armory",
+    "version": "0.1.0",
+    "description": "Reusable software engineering workflows for coding agents.",
+    "skills": "./skills/",
+    "license": "Apache-2.0",
+    "repository": "https://github.com/arhor/dev-armory"
+}
