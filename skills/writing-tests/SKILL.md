@@ -1,6 +1,6 @@
 ---
 name: writing-tests
-description: Write and revise automated tests using repository conventions and behavior-driven structure. Use when adding, updating, fixing, or reviewing tests.
+description: Write and revise automated tests using repository conventions and behavior-focused structure. Use when adding, updating, fixing, or reviewing tests.
 ---
 
 # Writing Tests
@@ -24,7 +24,7 @@ Prefer conventions closest to the code under test when repository conventions ar
 
 Design tests around the behavior visible through the unit's public or meaningful external contract.
 
-Test relevant:
+Test relevant behaviors such as:
 
 - outputs and returned values;
 - externally visible state changes;
@@ -89,7 +89,7 @@ Keep names specific enough that a failing test communicates what behavior broke 
 
 ## Use Given / When / Then
 
-Divide every test body into exactly three visible sections, once each and in his order:
+Divide every test body into exactly three visible sections, once each and in this order:
 
 ```text
 // Given
