@@ -40,4 +40,4 @@ Do not invent alternatives that were not genuinely considered.
 
 ## References
 
-- Add related ADRs, issues, pull requests, architecture documentation, or authoritative code references as needed.
+None.
