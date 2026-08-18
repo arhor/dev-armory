@@ -21,6 +21,7 @@ Before choosing layout, components, styling, or verification strategy:
 4. Read any repository-specific visual, product, accessibility, or interaction guidance that applies to the feature.
 5. Read [Compose design guidance](references/compose-design-guidance.md) for every design or implementation task.
 6. Read [Visual verification](references/visual-verification.md) before planning rendered checks or reviewing a supplied image.
+7. Read [Provenance and maintenance](references/provenance.md) only when updating this skill or incorporating guidance from external sources.
 
 Repository-specific design rules are authoritative. This skill supplies a reusable design process, not a product identity.
 
