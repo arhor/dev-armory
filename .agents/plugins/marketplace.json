@@ -1,0 +1,20 @@
+{
+    "name": "dev-armory",
+    "interface": {
+        "displayName": "Dev Armory"
+    },
+    "plugins": [
+        {
+            "name": "dev-armory",
+            "source": {
+                "source": "local",
+                "path": "./"
+            },
+            "policy": {
+                "installation": "AVAILABLE",
+                "authentication": "ON_INSTALL"
+            },
+            "category": "Productivity"
+        }
+    ]
+}
